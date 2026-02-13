@@ -1,0 +1,7 @@
+arxiv
+requests
+feedparser
+beautifulsoup4
+anthropic
+python-dateutil
+schedule

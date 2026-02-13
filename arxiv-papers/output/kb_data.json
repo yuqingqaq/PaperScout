@@ -1,0 +1,218 @@
+{
+  "metadata": {
+    "last_updated": "2026-02-13 12:11:53",
+    "source_file": "/Users/irismini/FeelingAI/PaperScout/arxiv-papers/references/knowledge_base.md"
+  },
+  "stats": {
+    "total_sections": 7,
+    "total_subsections": 4,
+    "total_referenced_papers": 2,
+    "content_length": 3295,
+    "pending_suggestions": 16,
+    "approved_suggestions": 2,
+    "rejected_suggestions": 0
+  },
+  "content": "\n\n# Agent Memory 领域知识库\n\n## 一、 核心综述框架\n### 1. 基础模型智能体记忆 (Foundation Agent Memory)\n该领域的研究重点已从单纯提升 Benchmark 分数转向解决现实世界中长周期、动态、用户依赖环境下的 **“上下文爆炸 (Context Explosion)”** 问题。\n\n### 2. 三维统一分类法 (Taxonomy)\n*   **存储介质 (Memory Substrate - \"形式\")**：\n    *   **外部记忆 (External)**：存储在模型参数之外，如向量索引、文本记录、结构化存储（SQL/图）或分层存储。\n    *   **内部记忆 (Internal)**：直接存储在架构内，包括 **参数权重 (Weights)** 和推理时的 **潜在状态 (Latent-state/KV Cache)**。\n*   **认知机制 (Cognitive Mechanism - \"功能\")**：\n    *   **感官记忆 (Sensory)**：临时缓冲原始感知输入（如多模态流）。\n    *   **工作记忆 (Working)**：维持和处理当前任务相关的推理状态（如 CoT、中间规划）。\n    *   **情景记忆 (Episodic)**：持久记录特定的互动经历（时间、地点、因果关系）。\n    *   **语义记忆 (Semantic)**：存储稳定的抽象知识、事实和概念（如百科全书、用户特质）。\n    *   **程序记忆 (Procedural)**：编码执行任务的技能、策略和自动化流程（如工具使用习惯、SOP）。\n*   **记忆主体 (Memory Subject - \"服务对象\")**：\n    *   **以用户为中心 (User-Centric)**：关注个性化偏好、身份一致性和隐私保护。\n    *   **以智能体为中心 (Agent-Centric)**：侧重于任务执行经验积累、跨任务知识迁移和技能习得。\n\n---\n\n## 二、 核心操作机制 (Memory Operation Mechanism)\n智能体通过一系列序列化操作主动管理记忆，而非将其视为静态仓库：\n\n1.  **存储与索引 (Storage & Index)**：将信息关联语义嵌入、时间戳、实体等元数据，使用向量或结构化图进行组织。\n2.  **加载与检索 (Loading & Retrieval)**：基于相关性、多样性和上下文配额进行筛选，避免上下文过载或干扰噪声。\n3.  **更新与刷新 (Update & Refresh)**：根据新观察、反馈或自反思修改旧记忆，通过合并、覆盖或调整权重防止过期。\n4.  **压缩与总结 (Compression & Summarization)**：将细粒度的情景记录提炼为抽象摘要或多级树状结构，缓解 Token 饱和。\n5.  **遗忘与保留 (Forgetting & Retention)**：显式移除低价值或过时数据，通过衰减机制或学习策略保护高价值知识。\n*   **[更新]** 对比性经验蒸馏：从成功/失败经验中提取泛化推理策略 (2509.25140v1)\n\n---\n\n## 三、 记忆学习策略 (Learning Policy)\n智能体如何学会高效管理记忆？综述将其归纳为三条路径：\n\n*   **基于提示 (Prompt-based)**：\n    *   **静态控制**：通过固定的 Prompt 模板或 OS 级架构（如 **MemGPT**, **EverMemOS**）强制执行记忆规范。\n    *   **动态优化**：智能体通过**自反思 (Reflexion)** 自动修正其记忆指令或重组存储结构。\n*   **微调强化 (Fine-tuning)**：通过监督信号将记忆内容或检索行为**参数化**，内化为模型的稳定行为。\n*   **强化学习 (Reinforcement Learning)**：\n    *   **步骤级决策**：学习在每一步执行 ADD/UPDATE/DELETE/NOOP 操作（如 **Memory-R1**）。\n    *   **轨迹级表征**：将记忆质量与长周期任务的最终奖励挂钩，驱动模型学习高效的压缩与保留策略。\n\n---\n\n## 四、 评估体系与挑战\n### 1. 核心能力指标 (Key Abilities)\n*   **Fact Extraction (FE)**：事实提取能力。\n*   **Multi-Session Reasoning (MR)**：跨会话推理。\n*   **Temporal Reasoning (TR)**：时序/时效性推理（EverMemOS 的核心优势之一）。\n*   **Abstain & Boundary (AB)**：边界处理，在缺失证据时学会拒绝回答。\n*   **Memory Integrity (MI)** & **False Memory Rate (FMR)**：记忆完整性与虚假记忆率（衡量幻觉）。\n\n### 2. 重要 Benchmark\n*   **个性化类**：PersonaMem-v2 (隐式偏好推理), MSC, DuLeMon。\n*   **任务/工具类**：OSWorld, WebArena (GUI/Web 操作记忆), SWE-bench (软件工程)。\n*   **综合推理类**：LoCoMo (长上下文记忆), HotpotQA。\n\n---\n\n## 五、 应用场景与垂直领域\n1.  **教育 (Education)**：模拟遗忘曲线进行个性化辅导（如 **LOOM**, **Agent4Edu**）。\n2.  **科学研究 (Scientific Research)**：跨实验的知识合成与验证（如 **GAM**, **IterResearch**）。\n3.  **医疗健康 (Healthcare)**：追踪用户的情绪轨迹与生理指标相关性（如 **TheraMind**, **Mem-PAL**）。\n4.  **游戏与仿真 (Gaming)**：Believable 的社交历史与技能进化（如 **Generative Agents**, **Voyager**）。\n5.  **软件工程 (SWE)**：大规模代码仓库的导航与历史 Fail-Fix 经验复用（如 **MetaGPT**）。\n\n---\n\n## 六、 研究趋势与前沿论文\n*   **EverMemOS (2026)**：提出了操作系统级的持久化记忆管理，通过“叙事重写”和“场景聚类”解决碎片化问题。\n*   **PersonaMem-v2 (2025)**：首次引入隐式偏好推理，结合 **GRPO 强化学习** 训练智能体自主提取并蒸馏用户档案。\n*   **Zep (Graphiti)**：典型的**时间感知知识图谱**架构，支持实体解析和边失效机制。\n*   **Memory-R1**：将记忆编辑（增删改）建模为显式行动空间的强化学习系统。\n\n---\n\n## 七、 未来方向 (Future Directions)\n*   **多模态与世界模型记忆**：将视觉、触觉流融入具有预测性的“世界模型记忆”中。\n*   **记忆基础设施效率**：解决线性 Token 增长问题，转向常数级大小的 latent memory 或参数化记忆。\n*   **可信记忆与隐私防御**：对抗记忆注入攻击（Memory Injection Attacks），支持用户审计和撤销存储。\n*   **人类-智能体协同记忆**：在多主体环境下管理角色分工、路由权限和冲突解决。\n\n*   **多智能体协作记忆：追踪智能体间交互轨迹与协作经验的记忆机制** (2506.07398v2)\n",
+  "suggestions": [
+    {
+      "type": "new_concept",
+      "section": "一、 核心综述框架 - 2. 三维统一分类法 - 记忆主体",
+      "content": "多智能体协作记忆：追踪智能体间交互轨迹与协作经验的记忆机制",
+      "reason": "知识库现有记忆主体仅包含User-Centric和Agent-Centric（单智能体视角），本文提出的多智能体协作记忆是针对MAS系统的新维度，关注智能体间协作轨迹和跨试验知识共享，与现有分类在服务对象层面有本质差异",
+      "paper_arxiv_id": "2506.07398v2",
+      "paper_title": "G-Memory: Tracing Hierarchical Memory for Multi-Agent Systems",
+      "id": 1,
+      "status": "approved",
+      "created_at": "2026-02-12 21:09:55",
+      "approved_at": "2026-02-12 21:11:06"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制",
+      "content": "层级图遍历：通过三层图结构（洞察-查询-交互）实现多粒度记忆检索",
+      "reason": "现有检索机制主要基于向量相似度或结构化查询，本文提出的层级图双向遍历结合了高层洞察和细粒度轨迹，是对检索操作的重要方法补充",
+      "paper_arxiv_id": "2506.07398v2",
+      "paper_title": "G-Memory: Tracing Hierarchical Memory for Multi-Agent Systems",
+      "id": 2,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "对比性经验蒸馏：从成功/失败经验中提取泛化推理策略",
+      "reason": "ReasoningBank的核心机制是从对比性经验(成功与失败)中蒸馏可泛化策略，这是一种新的记忆形成和更新模式，区别于传统的轨迹存储或单一成功案例学习",
+      "paper_arxiv_id": "2509.25140v1",
+      "paper_title": "ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory",
+      "id": 3,
+      "status": "approved",
+      "created_at": "2026-02-12 21:09:55",
+      "approved_at": "2026-02-12 21:15:35"
+    },
+    {
+      "type": "new_concept",
+      "section": "三、 记忆学习策略",
+      "content": "记忆驱动的测试时扩展：通过扩展交互经验加速记忆学习",
+      "reason": "MaTTS将测试时计算扩展与记忆学习相结合，建立了记忆质量与计算资源之间的协同关系，是一个全新的记忆学习范式，超越了现有的Prompt-based、Fine-tuning和RL分类",
+      "paper_arxiv_id": "2509.25140v1",
+      "paper_title": "ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory",
+      "id": 4,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "new_concept",
+      "section": "四、 评估体系与挑战",
+      "content": "记忆安全性(Memory Security)：防御恶意记忆注入攻击与误差自增强循环",
+      "reason": "知识库现有评估指标关注记忆完整性和虚假记忆率，但未涵盖主动对抗性攻击防御这一新兴安全维度，该论文系统性提出了记忆注入攻击威胁模型和防御范式",
+      "paper_arxiv_id": "2510.02373v1",
+      "paper_title": "A-MemGuard: A Proactive Defense Framework for LLM-Based Agent Memory",
+      "id": 5,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "验证与审计(Validation & Audit)：通过共识机制检测记忆异常，使用双记忆结构存储失败教训",
+      "reason": "现有操作机制未包含记忆验证和自我纠错能力，A-MemGuard提出的共识验证和教训学习机制填补了这一空白",
+      "paper_arxiv_id": "2510.02373v1",
+      "paper_title": "A-MemGuard: A Proactive Defense Framework for LLM-Based Agent Memory",
+      "id": 6,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "自适应衰减遗忘：基于语义相关性、访问频率和时序模式的指数衰减函数",
+      "reason": "知识库第5点'遗忘与保留'仅提及衰减机制，该论文提出了具体的多因素自适应衰减实现，是重要的技术补充",
+      "paper_arxiv_id": "2601.18642v2",
+      "paper_title": "FadeMem: Biologically-Inspired Forgetting for Efficient Agent Memory",
+      "id": 7,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "图结构组织：利用节点表示实体/事件，边表示关系/因果，支持层次化索引与路径推理",
+      "reason": "知识库提到了结构化存储（图）但未详细展开图结构的操作机制，该论文系统阐述了图在提取、存储、检索、演化全生命周期的具体实现方法",
+      "paper_arxiv_id": "2602.05665v1",
+      "paper_title": "Graph-based Agent Memory: Taxonomy, Techniques, and Applications",
+      "id": 8,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "意图感知索引：通过结构化意图（目标、动作类型、实体类型）消歧检索",
+      "reason": "在现有检索机制基础上，提出了通过上下文意图解决语义相似但上下文不兼容记忆的新方法，是对检索机制的重要补充",
+      "paper_arxiv_id": "2601.10702v1",
+      "paper_title": "Grounding Agent Memory in Contextual Intent",
+      "id": 9,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "四、 评估体系与挑战",
+      "content": "认知记忆评估(Cognitive Memory)：评估隐式约束保留与应用能力",
+      "reason": "知识库现有评估指标主要关注显式事实提取和多会话推理，该论文提出的认知记忆评估维度（隐式约束、线索-触发语义断裂）是对现有评估体系的重要补充，代表了超越事实记忆的新评估方向",
+      "paper_arxiv_id": "2602.10715v1",
+      "paper_title": "Locomo-Plus: Beyond-Factual Cognitive Memory Evaluation Framework for LLM Agents",
+      "id": 10,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "一、 核心综述框架 - 2. 三维统一分类法 - 认知机制",
+      "content": "双进程记忆：分离短期执行轨迹与长期语义整合，实现持久身份进化",
+      "reason": "提出了情景记忆与语义记忆的系统性分离与协同机制，这是知识库中认知机制分类的重要实现模式，补充了情景-语义记忆交互的具体方法论",
+      "paper_arxiv_id": "2602.10429v1",
+      "paper_title": "AIvilization v0: Toward Large-Scale Artificial Social Simulation with a Unified Agent Architecture and Adaptive Agent Profiles",
+      "id": 11,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "三、 记忆学习策略",
+      "content": "元经验内化：从错误轨迹提取元知识并参数化存储",
+      "reason": "知识库已有强化学习分类，但元经验学习(Meta-Experience Learning)代表了一种独特的从错误中学习并参数化存储的机制，是对现有RL记忆学习的重要补充",
+      "paper_arxiv_id": "2602.10224v1",
+      "paper_title": "Internalizing Meta-Experience into Memory for Guided Reinforcement Learning in Large Language Models",
+      "id": 12,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "new_concept",
+      "section": "四、 评估体系与挑战",
+      "content": "记忆隐私安全：Agent记忆模块面临的私有信息泄露风险与防护需求",
+      "reason": "知识库当前未涵盖Agent Memory的安全与隐私维度，这是记忆系统实际部署中的关键挑战，该论文系统性地揭示了这一新问题",
+      "paper_arxiv_id": "2502.13172v2",
+      "paper_title": "Unveiling Privacy Risks in LLM Agent Memory",
+      "id": 13,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "拜占庭容错共识遗忘：多智能体通过PBFT机制协同决策记忆保留与删除",
+      "reason": "知识库已有遗忘机制，但缺少多智能体分布式容错遗忘的方法，这是首个将区块链共识机制引入记忆遗忘的工作",
+      "paper_arxiv_id": "2506.17338v2",
+      "paper_title": "PBFT-Backed Semantic Voting for Multi-Agent Memory Pruning",
+      "id": 14,
+      "status": "pending",
+      "created_at": "2026-02-12 21:09:55"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "记忆巩固：将情景检索逐步蒸馏为参数化语义记忆，实现计算递减",
+      "reason": "知识库已有遗忘与保留机制，但缺少情景到语义的主动巩固过程，这是记忆操作的重要补充维度",
+      "paper_arxiv_id": "2602.12204v1",
+      "paper_title": "Learning to Forget Attention: Memory Consolidation for Adaptive Compute Reduction",
+      "id": 15,
+      "status": "pending",
+      "created_at": "2026-02-13 12:11:52"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "主动工具编排：模型通过内部推理循环自主调度剪枝、索引、笔记等记忆工具",
+      "reason": "知识库已有操作机制分类，但缺少模型主动编排多工具的协同管理范式，这是从被动接受到主动操作的关键转变",
+      "paper_arxiv_id": "2602.12108v1",
+      "paper_title": "The Pensieve Paradigm: Stateful Language Models Mastering Their Own Context",
+      "id": 16,
+      "status": "pending",
+      "created_at": "2026-02-13 12:11:52"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "记忆判别：通过门控机制和场景感知决策哪些交互值得写入记忆",
+      "reason": "知识库已有存储、遗忘等操作，但缺少写入前的选择性判别机制，这是记忆形成的前置环节，补充了从感知到存储的关键中间步骤",
+      "paper_arxiv_id": "2602.11607v1",
+      "paper_title": "Scene-Aware Memory Discrimination: Deciding Which Personal Knowledge Stays",
+      "id": 17,
+      "status": "pending",
+      "created_at": "2026-02-13 12:11:52"
+    },
+    {
+      "type": "update_existing",
+      "section": "二、 核心操作机制 (Memory Operation Mechanism)",
+      "content": "溢出检测：通过查询感知分类器识别压缩导致的信息丢失",
+      "reason": "知识库已有压缩与总结机制，此论文补充了压缩质量监控维度，填补了压缩过度导致信息损失的检测空白，为动态调整压缩策略提供实用工具",
+      "paper_arxiv_id": "2602.12235v1",
+      "paper_title": "Detecting Overflow in Compressed Token Representations for Retrieval-Augmented Generation",
+      "id": 18,
+      "status": "pending",
+      "created_at": "2026-02-13 12:11:52"
+    }
+  ]
+}

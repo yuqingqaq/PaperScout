@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Memory Papers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --border-color: #e8e8e8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --accent-color: #333333;
+            --tag-bg: #f5f5f5;
+            --hover-bg: #f0f0f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .refresh-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .refresh-btn.loading {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .sidebar-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* All papers button */
+        .all-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: left;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .all-btn:hover {
+            background: var(--hover-bg);
+        }
+
+        .all-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .count {
+            float: right;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Sort controls */
+        .sort-controls {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sort-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sort-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sort-btn:hover {
+            background: var(--hover-bg);
+        }
+
+        .sort-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        /* Label filters - moved to top right of main content */
+        .label-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .label-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .label-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border-color: #ccc;
+        }
+
+        .label-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .label-name {
+            /* no flex needed */
+        }
+
+        .label-count {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* Tree structure */
+        .tree-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .time-tree {
+            list-style: none;
+        }
+
+        .month-item {
+            margin-bottom: 4px;
+        }
+
+        .month-label {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .month-label:hover {
+            background: var(--hover-bg);
+        }
+
+        .month-label .arrow {
+            margin-right: 8px;
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+
+        .month-item.expanded .month-label .arrow {
+            transform: rotate(90deg);
+        }
+
+        .week-list {
+            list-style: none;
+            padding-left: 20px;
+            display: none;
+        }
+
+        .month-item.expanded .week-list {
+            display: block;
+        }
+
+        .week-item {
+            margin: 2px 0;
+        }
+
+        .week-label {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .week-label:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .week-label .arrow {
+            margin-right: 8px;
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+
+        .week-item.expanded .week-label .arrow {
+            transform: rotate(90deg);
+        }
+
+        .day-list {
+            list-style: none;
+            padding-left: 20px;
+            display: none;
+        }
+
+        .week-item.expanded .day-list {
+            display: block;
+        }
+
+        .day-btn {
+            display: block;
+            width: 100%;
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .day-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .day-btn.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            padding: 40px;
+            background: var(--bg-primary);
+            min-width: 0;
+        }
+
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .header-left h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .header-left .subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .header-filters {
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filters-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        /* Papers list */
+        .papers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .paper-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .paper-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border-color: #ddd;
+        }
+
+        .paper-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .paper-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            background: var(--tag-bg);
+            border-radius: 100px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .tag.highlight {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .section {
+            margin-bottom: 16px;
+        }
+
+        .section:last-of-type {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contributions, .results {
+            list-style: none;
+            padding: 0;
+        }
+
+        .contributions li, .results li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .contributions li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .results li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+        }
+
+        .links {
+            display: flex;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .link-btn {
+            padding: 8px 16px;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .link-btn:hover {
+            background: #555;
+        }
+
+        .link-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .link-btn.secondary:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Community signals section */
+        .community-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .community-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .community-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .community-stat strong {
+            color: var(--text-primary);
+        }
+
+        .discussions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .discussion-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .discussion-item:hover {
+            border-color: #ccc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .discussion-source {
+            flex-shrink: 0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .discussion-source.twitter {
+            background: #e8f5fd;
+            color: #1da1f2;
+        }
+
+        .discussion-source.reddit {
+            background: #fff3e8;
+            color: #ff4500;
+        }
+
+        .discussion-source.hackernews {
+            background: #fff8e8;
+            color: #ff6600;
+        }
+
+        .discussion-source.unknown {
+            background: var(--tag-bg);
+            color: var(--text-secondary);
+        }
+
+        .discussion-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .discussion-title {
+            font-size: 13px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .discussion-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .discussion-title a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        .discussion-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        /* Knowledge Base Styles */
+        .kb-panel {
+            display: none;
+        }
+
+        .kb-panel.active {
+            display: block;
+        }
+
+        .kb-header {
+            margin-bottom: 24px;
+        }
+
+        .kb-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .kb-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .kb-tab:hover {
+            background: var(--hover-bg);
+        }
+
+        .kb-tab.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .kb-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .kb-markdown {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .kb-markdown h1 {
+            font-size: 24px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .kb-markdown h2 {
+            font-size: 20px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--accent-color);
+        }
+
+        .kb-markdown h3 {
+            font-size: 16px;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .kb-markdown ul {
+            padding-left: 20px;
+        }
+
+        .kb-markdown li {
+            margin-bottom: 6px;
+        }
+
+        .kb-markdown strong {
+            color: var(--text-primary);
+        }
+
+        /* Suggestions styles */
+        .suggestion-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .suggestion-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .suggestion-type {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .suggestion-type.new_direction {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .suggestion-type.new_taxonomy {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .suggestion-type.new_concept {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .suggestion-type.new_milestone {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .suggestion-type.update_existing {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .suggestion-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .suggestion-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+        }
+
+        .suggestion-reason {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .suggestion-source {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .suggestion-source a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .suggestion-source a:hover {
+            text-decoration: underline;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .suggestion-btn {
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .suggestion-btn.approve {
+            background: #4caf50;
+            color: white;
+        }
+
+        .suggestion-btn.approve:hover {
+            background: #388e3c;
+        }
+
+        .suggestion-btn.reject {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .suggestion-btn.reject:hover {
+            background: #ffebee;
+            color: #c62828;
+            border-color: #c62828;
+        }
+
+        .kb-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .kb-stat-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            min-width: 120px;
+        }
+
+        .kb-stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .kb-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .no-suggestions {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: none;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .main {
+                padding: 24px 16px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .label-filters {
+                justify-content: flex-start;
+            }
+
+            .label-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-header-top">
+                    <h1>📚 Agent Memory</h1>
+                    <button class="refresh-btn" id="update-btn" title="更新论文">🔄</button>
+                </div>
+                <p>精选论文 · 每日更新</p>
+            </div>
+
+            <!-- Knowledge Base Button -->
+            <button class="all-btn" id="kb-btn" style="margin-bottom: 8px;">
+                📚 知识库 <span class="count" id="kb-suggestions-count">0</span>
+            </button>
+
+            <button class="all-btn active" id="all-btn">
+                全部论文 <span class="count" id="total-count"></span>
+            </button>
+
+            <!-- Sort Controls -->
+            <div class="sort-controls">
+                <div class="sort-label">排序方式</div>
+                <div class="sort-buttons">
+                    <button class="sort-btn active" data-sort="recommend">推荐</button>
+                    <button class="sort-btn" data-sort="published">发表</button>
+                </div>
+            </div>
+
+            <!-- Time Tree -->
+            <div class="tree-label">时间筛选</div>
+            <ul class="time-tree" id="time-tree">
+                <!-- Generated by JS -->
+            </ul>
+        </div>
+
+        <div class="main">
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-left">
+                        <h2 id="current-title">全部论文</h2>
+                        <p class="subtitle" id="current-subtitle"></p>
+                    </div>
+                </div>
+                <div class="header-filters">
+                    <div class="filters-label">标签筛选</div>
+                    <div class="label-filters" id="label-list">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="papers-list" id="papers-list">
+                <!-- Generated by JS -->
+            </div>
+
+            <!-- Knowledge Base Panel -->
+            <div class="kb-panel" id="kb-panel">
+                <div class="kb-header">
+                    <h2>📚 Agent Memory 知识库</h2>
+                    <p class="subtitle">领域知识框架与更新建议</p>
+                </div>
+
+                <div class="kb-stats" id="kb-stats">
+                    <!-- Generated by JS -->
+                </div>
+
+                <div class="kb-tabs">
+                    <button class="kb-tab active" data-tab="content">知识库内容</button>
+                    <button class="kb-tab" data-tab="suggestions">待确认建议 <span id="pending-count">0</span></button>
+                    <button class="kb-tab" data-tab="history">历史记录</button>
+                </div>
+
+                <div class="kb-content" id="kb-content-tab">
+                    <div class="kb-markdown" id="kb-markdown">
+                        加载中...
+                    </div>
+                </div>
+
+                <div class="kb-content" id="kb-suggestions-tab" style="display: none;">
+                    <div id="suggestions-list">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <div class="kb-content" id="kb-history-tab" style="display: none;">
+                    <div id="history-list">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fixed labels for Agent Memory domain
+        const FIXED_LABELS = [
+            'Survey',
+            'RAG',
+            'Memory',
+            'Multi-Agent',
+            'Reasoning',
+            'Long-Context',
+            'Retrieval',
+            'Fine-tuning',
+            'Reinforcement Learning',
+            'Self-Organizing',
+            'Personalization',
+            'Knowledge Graph',
+            'Embodied AI',
+            'Tool Use'
+        ];
+
+        let papers = [];
+        let kbContent = '';
+        let kbSuggestions = [];
+        let kbHistory = [];
+        let kbStats = {};
+        let currentSort = 'recommend';
+        let currentFilter = 'all';
+        let currentLabel = null;
+        let currentView = 'papers'; // 'papers' or 'kb'
+
+        // Fetch papers.json and knowledge base data
+        // 知识库数据从 kb_data.json 读取（由后端生成）
+        Promise.all([
+            fetch('papers.json').then(res => res.json()),
+            fetch('kb_data.json').then(res => res.json()).catch(() => ({content: '', suggestions: [], history: [], stats: {}}))
+        ]).then(([papersData, kbData]) => {
+            papers = papersData.papers || [];
+            kbContent = kbData.content || '';
+            kbSuggestions = kbData.suggestions || [];
+            kbHistory = kbData.history || [];
+            kbStats = kbData.stats || {};
+            init();
+        }).catch(err => {
+            console.error('Failed to load data:', err);
+            document.getElementById('papers-list').innerHTML =
+                '<div class="empty-state"><h3>加载失败</h3><p>无法加载数据</p></div>';
+        });
+
+        function init() {
+            document.getElementById('total-count').textContent = papers.length;
+            buildLabelFilters();
+            buildTree();
+            renderPapers(papers);
+            setupSortButtons();
+            setupAllButton();
+            setupKnowledgeBase();
+            setupUpdateButton();
+        }
+
+        function setupUpdateButton() {
+            document.getElementById('update-btn').onclick = runDaily;
+        }
+
+        function runDaily() {
+            if (!confirm('确认运行每日论文更新？\n\n这将搜索 arXiv、AI 分析、并更新 papers.json。\n可能需要几分钟时间。')) {
+                return;
+            }
+
+            const btn = document.getElementById('update-btn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            fetch('/api/run-daily', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+
+                if (data.success) {
+                    alert(`✅ 更新完成！新增 ${data.added_papers} 篇论文。\n\n页面将刷新以加载最新数据。`);
+                    location.reload();
+                } else {
+                    alert('❌ 更新失败: ' + data.error);
+                }
+            })
+            .catch(err => {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                alert('❌ 请求失败: ' + err);
+            });
+        }
+
+        // =============== Knowledge Base Functions ===============
+        function setupKnowledgeBase() {
+            const pendingCount = kbSuggestions.filter(s => s.status === 'pending').length;
+            document.getElementById('kb-suggestions-count').textContent = pendingCount;
+            document.getElementById('pending-count').textContent = pendingCount;
+
+            // KB button click
+            document.getElementById('kb-btn').onclick = () => {
+                showKnowledgeBase();
+            };
+
+            // KB tabs
+            document.querySelectorAll('.kb-tab').forEach(tab => {
+                tab.onclick = () => {
+                    document.querySelectorAll('.kb-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const tabName = tab.dataset.tab;
+                    showKBTab(tabName);
+                };
+            });
+
+            // Render KB content
+            renderKBContent();
+            renderKBStats();
+        }
+
+        function showKnowledgeBase() {
+            currentView = 'kb';
+            document.getElementById('papers-list').style.display = 'none';
+            document.getElementById('kb-panel').classList.add('active');
+            document.getElementById('all-btn').classList.remove('active');
+            document.getElementById('kb-btn').classList.add('active');
+            document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+
+            // Hide paper-specific elements
+            document.querySelector('.header-filters').style.display = 'none';
+            document.getElementById('current-title').textContent = '知识库';
+            document.getElementById('current-subtitle').textContent = 'Agent Memory 领域知识框架';
+        }
+
+        function showPapers() {
+            currentView = 'papers';
+            document.getElementById('papers-list').style.display = 'flex';
+            document.getElementById('kb-panel').classList.remove('active');
+            document.getElementById('kb-btn').classList.remove('active');
+            document.querySelector('.header-filters').style.display = 'block';
+        }
+
+        function showKBTab(tabName) {
+            document.getElementById('kb-content-tab').style.display = tabName === 'content' ? 'block' : 'none';
+            document.getElementById('kb-suggestions-tab').style.display = tabName === 'suggestions' ? 'block' : 'none';
+            document.getElementById('kb-history-tab').style.display = tabName === 'history' ? 'block' : 'none';
+
+            if (tabName === 'suggestions') {
+                renderPendingSuggestions();
+            } else if (tabName === 'history') {
+                renderSuggestionHistory();
+            }
+        }
+
+        function renderKBStats() {
+            const pendingCount = kbSuggestions.filter(s => s.status === 'pending').length;
+            const approvedCount = kbSuggestions.filter(s => s.status === 'approved').length;
+
+            document.getElementById('kb-stats').innerHTML = `
+                <div class="kb-stat-item">
+                    <div class="kb-stat-value">${papers.length}</div>
+                    <div class="kb-stat-label">收录论文</div>
+                </div>
+                <div class="kb-stat-item">
+                    <div class="kb-stat-value">${pendingCount}</div>
+                    <div class="kb-stat-label">待确认建议</div>
+                </div>
+                <div class="kb-stat-item">
+                    <div class="kb-stat-value">${approvedCount}</div>
+                    <div class="kb-stat-label">已采纳</div>
+                </div>
+                <div class="kb-stat-item">
+                    <div class="kb-stat-value">${kbStats.total_sections || 7}</div>
+                    <div class="kb-stat-label">知识章节</div>
+                </div>
+            `;
+        }
+
+        function renderKBContent() {
+            const mdEl = document.getElementById('kb-markdown');
+            if (!kbContent) {
+                mdEl.innerHTML = '<div class="empty-state"><p>知识库内容为空</p></div>';
+                return;
+            }
+
+            // Simple markdown to HTML conversion
+            let html = kbContent
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                .replace(/^\*   /gim, '<li>')
+                .replace(/^---$/gim, '<hr>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+
+            // Wrap list items
+            html = html.replace(/(<li>.*?(?=<li>|<h|<p>|$))/gs, '<ul>$1</ul>');
+
+            mdEl.innerHTML = `<p>${html}</p>`;
+        }
+
+        function renderPendingSuggestions() {
+            const container = document.getElementById('suggestions-list');
+            const pending = kbSuggestions.filter(s => s.status === 'pending');
+
+            if (pending.length === 0) {
+                container.innerHTML = '<div class="no-suggestions">🎉 没有待确认的建议</div>';
+                return;
+            }
+
+            container.innerHTML = pending.map(s => `
+                <div class="suggestion-card" data-id="${s.id}">
+                    <div class="suggestion-header">
+                        <span class="suggestion-type ${s.type || s.suggestion_type}">${formatSuggestionType(s.type || s.suggestion_type)}</span>
+                        <span class="suggestion-meta">${s.created_at || ''}</span>
+                    </div>
+                    <div class="suggestion-source">
+                        来源论文: <a href="https://arxiv.org/abs/${s.paper_arxiv_id}" target="_blank">${s.paper_title || s.paper_arxiv_id}</a>
+                    </div>
+                    <div class="suggestion-content">${s.content}</div>
+                    <div class="suggestion-reason">💡 ${s.reason}</div>
+                    <div class="suggestion-actions">
+                        <button class="suggestion-btn approve" onclick="approveSuggestion(${s.id})">采纳</button>
+                        <button class="suggestion-btn reject" onclick="rejectSuggestion(${s.id})">拒绝</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSuggestionHistory() {
+            const container = document.getElementById('history-list');
+            const processed = kbSuggestions.filter(s => s.status !== 'pending');
+
+            if (processed.length === 0) {
+                container.innerHTML = '<div class="no-suggestions">暂无历史记录</div>';
+                return;
+            }
+
+            container.innerHTML = processed.map(s => `
+                <div class="suggestion-card" style="opacity: 0.8;">
+                    <div class="suggestion-header">
+                        <span class="suggestion-type ${s.type || s.suggestion_type}">${formatSuggestionType(s.type || s.suggestion_type)}</span>
+                        <span class="suggestion-meta" style="color: ${s.status === 'approved' ? '#4caf50' : '#f44336'}">
+                            ${s.status === 'approved' ? '已采纳' : '已拒绝'} · ${s.approved_at || s.rejected_at || ''}
+                        </span>
+                    </div>
+                    <div class="suggestion-source">
+                        来源: <a href="https://arxiv.org/abs/${s.paper_arxiv_id}" target="_blank">${s.paper_title || s.paper_arxiv_id}</a>
+                    </div>
+                    <div class="suggestion-content">${s.content}</div>
+                    ${s.reject_reason ? `<div class="suggestion-reason" style="color: #f44336;">拒绝理由: ${s.reject_reason}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function formatSuggestionType(type) {
+            const types = {
+                'new_direction': '🚀 新方向',
+                'new_taxonomy': '📊 新分类',
+                'new_concept': '💡 新概念',
+                'new_milestone': '⭐ 里程碑',
+                'update_existing': '✏️ 更新'
+            };
+            return types[type] || type;
+        }
+
+        function approveSuggestion(id) {
+            const suggestion = kbSuggestions.find(s => s.id === id);
+            if (!suggestion) return;
+            
+            if (!confirm(`确认采纳这条建议？\n\n“${suggestion.content}”\n\n这将直接更新 knowledge_base.md 文件。`)) {
+                return;
+            }
+            
+            fetch('/api/approve-suggestion', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id: id})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message + '\n\n页面将刷新以显示最新知识库内容。');
+                    location.reload();
+                } else {
+                    alert('❌ ' + data.error);
+                }
+            })
+            .catch(err => alert('❌ 请求失败: ' + err));
+        }
+
+        function rejectSuggestion(id) {
+            const reason = prompt('请输入拒绝理由（可选）:');
+            if (reason === null) return; // 用户取消
+            
+            const suggestion = kbSuggestions.find(s => s.id === id);
+            if (!suggestion) return;
+            
+            fetch('/api/reject-suggestion', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id: id, reason: reason})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('❌ ' + data.error);
+                }
+            })
+            .catch(err => alert('❌ 请求失败: ' + err));
+        }
+
+        function updateSuggestionsUI() {
+            const pendingCount = kbSuggestions.filter(s => s.status === 'pending').length;
+            document.getElementById('kb-suggestions-count').textContent = pendingCount;
+            document.getElementById('pending-count').textContent = pendingCount;
+            renderPendingSuggestions();
+            renderKBStats();
+        }
+
+        function matchesLabel(paper, label) {
+            if (!paper.tags || !Array.isArray(paper.tags)) return false;
+
+            return paper.tags.some(tag => {
+                const normalizedTag = tag.toLowerCase();
+                const normalizedLabel = label.toLowerCase();
+
+                // Exact match or contains
+                return normalizedTag === normalizedLabel ||
+                       normalizedTag.includes(normalizedLabel) ||
+                       normalizedLabel.includes(normalizedTag);
+            });
+        }
+
+        function buildLabelFilters() {
+            const labelListEl = document.getElementById('label-list');
+            labelListEl.innerHTML = '';
+
+            FIXED_LABELS.forEach(label => {
+                const count = papers.filter(p => matchesLabel(p, label)).length;
+
+                const btn = document.createElement('button');
+                btn.className = 'label-btn';
+                btn.innerHTML = `<span class="label-name">${label}</span><span class="label-count">${count}</span>`;
+
+                btn.onclick = () => {
+                    // 切换回论文视图（如果当前在知识库视图）
+                    if (currentView === 'kb') {
+                        showPapers();
+                    }
+                    
+                    if (currentLabel === label) {
+                        // Deselect
+                        currentLabel = null;
+                        btn.classList.remove('active');
+                        document.getElementById('all-btn').classList.add('active');
+                        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+                        currentFilter = 'all';
+                        document.getElementById('current-title').textContent = '全部论文';
+                        document.getElementById('current-subtitle').textContent = `共 ${papers.length} 篇`;
+                        renderPapers(papers);
+                    } else {
+                        // Select
+                        currentLabel = label;
+                        document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.getElementById('all-btn').classList.remove('active');
+                        document.getElementById('kb-btn').classList.remove('active');
+                        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+                        currentFilter = 'label';
+
+                        const filtered = papers.filter(p => matchesLabel(p, label));
+                        document.getElementById('current-title').textContent = label;
+                        document.getElementById('current-subtitle').textContent = `${filtered.length} 篇论文`;
+                        renderPapers(filtered);
+                    }
+                };
+
+                labelListEl.appendChild(btn);
+            });
+        }
+
+        function getDateKey(paper, sortBy) {
+            return sortBy === 'recommend' ? paper.recommend_date : paper.published;
+        }
+
+        function getDayName(dateStr) {
+            const date = new Date(dateStr);
+            const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            return days[date.getDay()];
+        }
+
+        function getWeekNumber(dateStr) {
+            const date = new Date(dateStr);
+            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+            const dayOfMonth = date.getDate();
+            return Math.ceil((dayOfMonth + firstDay.getDay()) / 7);
+        }
+
+        function buildTree() {
+            const tree = {};
+            const isRecommend = currentSort === 'recommend';
+
+            let papersToTree = papers;
+            if (currentLabel) {
+                papersToTree = papers.filter(p => matchesLabel(p, currentLabel));
+            }
+
+            papersToTree.forEach(p => {
+                const dateStr = getDateKey(p, currentSort);
+                if (!dateStr) return;
+
+                const date = new Date(dateStr);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+                if (isRecommend) {
+                    const weekKey = `第${getWeekNumber(dateStr)}周`;
+                    if (!tree[monthKey]) tree[monthKey] = {};
+                    if (!tree[monthKey][weekKey]) tree[monthKey][weekKey] = {};
+                    if (!tree[monthKey][weekKey][dateStr]) tree[monthKey][weekKey][dateStr] = [];
+                    tree[monthKey][weekKey][dateStr].push(p);
+                } else {
+                    if (!tree[monthKey]) tree[monthKey] = {};
+                    if (!tree[monthKey][dateStr]) tree[monthKey][dateStr] = [];
+                    tree[monthKey][dateStr].push(p);
+                }
+            });
+
+            const treeEl = document.getElementById('time-tree');
+            treeEl.innerHTML = '';
+
+            Object.keys(tree).sort().reverse().forEach((monthKey, monthIdx) => {
+                const monthLi = document.createElement('li');
+                monthLi.className = 'month-item' + (monthIdx === 0 ? ' expanded' : '');
+
+                const monthLabel = document.createElement('div');
+                monthLabel.className = 'month-label';
+                monthLabel.innerHTML = `<span class="arrow">▶</span>${monthKey}`;
+                monthLabel.onclick = () => monthLi.classList.toggle('expanded');
+                monthLi.appendChild(monthLabel);
+
+                const weekListUl = document.createElement('ul');
+                weekListUl.className = 'week-list';
+
+                if (isRecommend) {
+                    Object.keys(tree[monthKey]).sort((a, b) => {
+                        const numA = parseInt(a.match(/\d+/)[0]);
+                        const numB = parseInt(b.match(/\d+/)[0]);
+                        return numB - numA;
+                    }).forEach((weekKey, weekIdx) => {
+                        const weekLi = document.createElement('li');
+                        weekLi.className = 'week-item' + (monthIdx === 0 && weekIdx === 0 ? ' expanded' : '');
+
+                        const weekLabel = document.createElement('div');
+                        weekLabel.className = 'week-label';
+                        weekLabel.innerHTML = `<span class="arrow">▶</span>${weekKey}`;
+                        weekLabel.onclick = (e) => {
+                            e.stopPropagation();
+                            weekLi.classList.toggle('expanded');
+                        };
+                        weekLi.appendChild(weekLabel);
+
+                        const dayUl = document.createElement('ul');
+                        dayUl.className = 'day-list';
+
+                        Object.keys(tree[monthKey][weekKey]).sort().reverse().forEach(dayKey => {
+                            const dayLi = document.createElement('li');
+                            const dayBtn = document.createElement('button');
+                            dayBtn.className = 'day-btn';
+
+                            const date = new Date(dayKey);
+                            const dayName = getDayName(dayKey);
+                            const dayNum = date.getDate();
+                            const count = tree[monthKey][weekKey][dayKey].length;
+
+                            dayBtn.innerHTML = `${dayNum}日 ${dayName} <span class="count">${count}</span>`;
+                            dayBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                selectDay(dayKey, tree[monthKey][weekKey][dayKey]);
+                            };
+
+                            dayLi.appendChild(dayBtn);
+                            dayUl.appendChild(dayLi);
+                        });
+
+                        weekLi.appendChild(dayUl);
+                        weekListUl.appendChild(weekLi);
+                    });
+                } else {
+                    Object.keys(tree[monthKey]).sort().reverse().forEach(dayKey => {
+                        const dayLi = document.createElement('li');
+                        const dayBtn = document.createElement('button');
+                        dayBtn.className = 'day-btn';
+
+                        const date = new Date(dayKey);
+                        const dayNum = date.getDate();
+                        const count = tree[monthKey][dayKey].length;
+
+                        dayBtn.innerHTML = `${dayNum}日 <span class="count">${count}</span>`;
+                        dayBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            selectDay(dayKey, tree[monthKey][dayKey]);
+                        };
+
+                        dayLi.appendChild(dayBtn);
+                        weekListUl.appendChild(dayLi);
+                    });
+                }
+
+                monthLi.appendChild(weekListUl);
+                treeEl.appendChild(monthLi);
+            });
+        }
+
+        function selectDay(dayKey, dayPapers) {
+            // 切换回论文视图（如果当前在知识库视图）
+            if (currentView === 'kb') {
+                showPapers();
+            }
+            
+            currentFilter = dayKey;
+            const date = new Date(dayKey);
+            const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+
+            document.getElementById('current-title').textContent =
+                `${monthNames[date.getMonth()]}${date.getDate()}日 · ${getDayName(dayKey)}`;
+            document.getElementById('current-subtitle').textContent =
+                `${dayPapers.length} 篇论文`;
+
+            document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('all-btn').classList.remove('active');
+            document.getElementById('kb-btn').classList.remove('active');
+            document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+            currentLabel = null;
+            event.currentTarget.classList.add('active');
+
+            renderPapers(dayPapers);
+        }
+
+        function setupAllButton() {
+            document.getElementById('all-btn').onclick = () => {
+                currentFilter = 'all';
+                currentLabel = null;
+                showPapers(); // Switch back to papers view
+                document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('all-btn').classList.add('active');
+                document.getElementById('current-title').textContent = '全部论文';
+                document.getElementById('current-subtitle').textContent = `共 ${papers.length} 篇`;
+                renderPapers(papers);
+            };
+        }
+
+        function setupSortButtons() {
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.onclick = () => {
+                    // 切换回论文视图（如果当前在知识库视图）
+                    if (currentView === 'kb') {
+                        showPapers();
+                        document.getElementById('all-btn').classList.add('active');
+                        currentFilter = 'all';
+                        document.getElementById('current-title').textContent = '全部论文';
+                        document.getElementById('current-subtitle').textContent = `共 ${papers.length} 篇`;
+                    }
+                    
+                    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSort = btn.dataset.sort;
+                    buildTree();
+
+                    if (currentFilter === 'all') {
+                        renderPapers(papers);
+                    } else if (currentFilter === 'label') {
+                        const filtered = papers.filter(p => matchesLabel(p, currentLabel));
+                        renderPapers(filtered);
+                    }
+                };
+            });
+        }
+
+        function renderPapers(papersToRender) {
+            const sorted = [...papersToRender].sort((a, b) => {
+                const dateA = getDateKey(a, currentSort) || '';
+                const dateB = getDateKey(b, currentSort) || '';
+                return dateB.localeCompare(dateA);
+            });
+
+            const list = document.getElementById('papers-list');
+
+            if (sorted.length === 0) {
+                list.innerHTML = '<div class="empty-state"><h3>暂无论文</h3><p>该筛选条件下没有论文</p></div>';
+                return;
+            }
+
+            list.innerHTML = sorted.map(p => {
+                const signals = p.community_signals || {};
+                const discussions = signals.discussions || [];
+                const githubRepos = signals.github_repos || [];
+                const hasSignals = signals.social_score > 0 || discussions.length > 0 || githubRepos.length > 0;
+                
+                // 生成讨论区 HTML
+                let communityHTML = '';
+                if (hasSignals) {
+                    communityHTML = `
+                    <div class="community-section">
+                        <div class="community-header">
+                            <span class="community-stat">📊 社区分数: <strong>${signals.social_score || 0}</strong></span>
+                            ${signals.github_stars > 0 ? `<span class="community-stat">⭐ GitHub Stars: <strong>${signals.github_stars}</strong></span>` : ''}
+                            ${discussions.length > 0 ? `<span class="community-stat">💬 讨论: <strong>${discussions.length}</strong></span>` : ''}
+                            ${signals.tweet_count > 0 ? `<span class="community-stat">🐦 Twitter: <strong>${signals.tweet_count}</strong></span>` : ''}
+                            ${signals.reddit_mentions > 0 ? `<span class="community-stat">🔴 Reddit: <strong>${signals.reddit_mentions}</strong></span>` : ''}
+                            ${signals.hacker_news_mentions > 0 ? `<span class="community-stat">🟠 HN: <strong>${signals.hacker_news_mentions}</strong></span>` : ''}
+                        </div>
+                        ${discussions.length > 0 ? `
+                        <div class="discussions-list">
+                            ${discussions.slice(0, 5).map(d => {
+                                const sourceClass = d.source.toLowerCase().replace(' ', '');
+                                const sourceIcon = d.source === 'Twitter' ? '🐦' : d.source === 'Reddit' ? '🔴' : d.source === 'Hacker News' ? '🟠' : '💬';
+                                return `
+                                <div class="discussion-item">
+                                    <span class="discussion-source ${sourceClass}">${sourceIcon} ${d.source}</span>
+                                    <div class="discussion-content">
+                                        <div class="discussion-title">
+                                            <a href="${d.url}" target="_blank">${d.title || '查看讨论'}</a>
+                                        </div>
+                                        <div class="discussion-meta">${d.age || ''} · 相关性: ${d.relevance || 'medium'}</div>
+                                    </div>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        ` : ''}
+                        ${githubRepos.length > 0 ? `
+                        <div class="discussions-list" style="margin-top: 12px;">
+                            ${githubRepos.slice(0, 3).map(repo => `
+                                <div class="discussion-item">
+                                    <span class="discussion-source" style="background: #f0f6fc; color: #24292f;">🐙 GitHub</span>
+                                    <div class="discussion-content">
+                                        <div class="discussion-title">
+                                            <a href="${repo.url}" target="_blank">${repo.repo_name}</a>
+                                            ${repo.stars > 0 ? `<span style="margin-left: 8px; color: var(--text-muted);">⭐ ${repo.stars}</span>` : ''}
+                                        </div>
+                                        <div class="discussion-meta">${repo.description ? repo.description.substring(0, 100) + '...' : ''}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+                    </div>
+                    `;
+                }
+
+                return `
+                <div class="paper-card">
+                    <div class="paper-title">${p.title}</div>
+                    <div class="paper-meta">
+                        <span class="meta-item">👤 ${p.authors || '未知作者'}</span>
+                        <span class="meta-item">📅 ${p.published}</span>
+                        <span class="meta-item">🔖 ${p.arxiv_id}</span>
+                        ${p.recommend_date ? `<span class="meta-item">⭐ 推荐 ${p.recommend_date}</span>` : ''}
+                        ${p.quality_score ? `<span class="meta-item">📊 评分 ${p.quality_score_adjusted || p.quality_score}</span>` : ''}
+                    </div>
+                    ${p.tags && p.tags.length > 0 ? `
+                    <div class="tags">
+                        ${p.tags.map(tag => {
+                            const isHighlight = currentLabel && matchesLabel({tags: [tag]}, currentLabel);
+                            return `<span class="tag ${isHighlight ? 'highlight' : ''}">${tag}</span>`;
+                        }).join('')}
+                    </div>
+                    ` : ''}
+                    ${p.recommendation ? `<div style="margin: 12px 0; padding: 10px; background: #f8f9fa; border-left: 3px solid var(--accent-color); font-size: 14px; color: var(--text-secondary);">💡 ${p.recommendation}</div>` : ''}
+                    ${p.contributions && p.contributions.length > 0 ? `
+                    <div class="section">
+                        <div class="section-title">主要贡献</div>
+                        <ul class="contributions">
+                            ${p.contributions.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    ${p.key_results && p.key_results.length > 0 ? `
+                    <div class="section">
+                        <div class="section-title">关键结果</div>
+                        <ul class="results">
+                            ${p.key_results.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    ${communityHTML}
+                    <div class="links">
+                        <a href="${p.arxiv_url}" class="link-btn" target="_blank">📄 arXiv</a>
+                        <a href="${p.pdf_url}" class="link-btn secondary" target="_blank">📥 PDF</a>
+                        ${p.github_url ? `<a href="${p.github_url}" class="link-btn secondary" target="_blank">💻 GitHub</a>` : ''}
+                    </div>
+                </div>
+            `}).join('');
+        }
+    </script>
+</body>
+</html>
