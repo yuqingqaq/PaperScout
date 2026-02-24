@@ -1,0 +1,35 @@
+{
+  "feishu": {
+    "webhook_url": "https://open.feishu.cn/open-apis/bot/v2/hook/YOUR_WEBHOOK_ID"
+  },
+  "litellm": {
+    "api_key": "sk-YOUR_API_KEY",
+    "base_url": "http://YOUR_SERVER_IP:PORT"
+  },
+  "arxiv": {
+    "search_keywords": [
+      "agent memory",
+      "llm agent memory",
+      "episodic memory",
+      "long-term memory"
+    ],
+    "max_results_per_keyword": 50,
+    "days_back": 3
+  },
+  "semantic_scholar": {
+    "enabled": true,
+    "api_key": ""
+  },
+  "recommendation": {
+    "max_papers": 20,
+    "schedule_time": "10:00",
+    "workdays_only": true,
+    "strict_relevance": true
+  },
+  "brave": {
+    "api_key": "YOUR_BRAVE_API_KEY",
+    "enabled": true,
+    "max_enrich": 20,
+    "verify_relevance": true
+  }
+}
