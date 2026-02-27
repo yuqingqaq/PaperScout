@@ -119,45 +119,73 @@ class ArxivFetcher:
         Returns:
             论文信息字典
         """
-        max_retries = 3
-        retry_count = 0
+        papers = self.get_papers_by_ids([arxiv_id])
+        return papers[0] if papers else None
 
-        while retry_count < max_retries:
-            try:
-                search = arxiv.Search(id_list=[arxiv_id])
-                result = next(search.results())
+    def get_papers_by_ids(self, arxiv_ids: List[str], batch_size: int = 10) -> List[Dict]:
+        """
+        批量获取多篇论文（减少 API 调用次数）
 
-                paper = {
-                    'arxiv_id': result.entry_id.split('/')[-1],
-                    'title': result.title.replace('\n', ' ').strip(),
-                    'authors': ', '.join([author.name for author in result.authors]),
-                    'published': result.published.strftime('%Y-%m-%d'),
-                    'abstract': result.summary.replace('\n', ' ').strip(),
-                    'arxiv_url': result.entry_id,
-                    'pdf_url': result.pdf_url,
-                    'categories': result.categories,
-                    'primary_category': result.primary_category
-                }
+        Args:
+            arxiv_ids: arXiv ID 列表
+            batch_size: 每批获取数量
 
-                return paper
-
-            except Exception as e:
-                retry_count += 1
-                error_msg = str(e)
-
-                if 'HTTP 429' in error_msg or 'HTTP 503' in error_msg:
-                    if retry_count < max_retries:
-                        wait_time = retry_count * 5
-                        logger.warning(f"触发限流，等待 {wait_time}s 后重试 {retry_count}/{max_retries}...")
-                        time.sleep(wait_time)
+        Returns:
+            论文信息列表
+        """
+        all_papers = []
+        
+        # 分批获取
+        for i in range(0, len(arxiv_ids), batch_size):
+            batch_ids = arxiv_ids[i:i + batch_size]
+            batch_num = i // batch_size + 1
+            total_batches = (len(arxiv_ids) + batch_size - 1) // batch_size
+            
+            logger.info(f"  批量获取 [{batch_num}/{total_batches}]: {len(batch_ids)} 篇论文...")
+            
+            max_retries = 3
+            retry_count = 0
+            
+            while retry_count < max_retries:
+                try:
+                    search = arxiv.Search(id_list=batch_ids)
+                    
+                    for result in search.results():
+                        paper = {
+                            'arxiv_id': result.entry_id.split('/')[-1],
+                            'title': result.title.replace('\n', ' ').strip(),
+                            'authors': ', '.join([author.name for author in result.authors]),
+                            'published': result.published.strftime('%Y-%m-%d'),
+                            'abstract': result.summary.replace('\n', ' ').strip(),
+                            'arxiv_url': result.entry_id,
+                            'pdf_url': result.pdf_url,
+                            'categories': result.categories,
+                            'primary_category': result.primary_category
+                        }
+                        all_papers.append(paper)
+                    
+                    break  # 成功，退出重试
+                    
+                except Exception as e:
+                    retry_count += 1
+                    error_msg = str(e)
+                    
+                    if 'HTTP 429' in error_msg or 'HTTP 503' in error_msg:
+                        if retry_count < max_retries:
+                            wait_time = retry_count * 10  # 10s, 20s, 30s
+                            logger.warning(f"  arXiv 限流，等待 {wait_time}s 后重试 {retry_count}/{max_retries}...")
+                            time.sleep(wait_time)
+                        else:
+                            logger.error(f"  批量获取失败（重试 {max_retries} 次）: {e}")
                     else:
-                        logger.error(f"获取论文 {arxiv_id} 失败（重试 {max_retries} 次）: {e}")
-                        return None
-                else:
-                    logger.error(f"获取论文 {arxiv_id} 失败: {e}")
-                    return None
-
-        return None
+                        logger.error(f"  批量获取失败: {e}")
+                        break
+            
+            # 批次间等待，避免限流
+            if i + batch_size < len(arxiv_ids):
+                time.sleep(3)
+        
+        return all_papers
 
     def search_semantic_scholar(self, query: str, limit: int = 10) -> List[Dict]:
         """

@@ -20,13 +20,13 @@ from src.utils import load_config, validate_config, ConfigError, setup_logging, 
 class ArxivPapersAgent:
     """ArXiv 论文推荐 Agent"""
 
-    def __init__(self, config_path: str, use_hybrid: bool = True):
+    def __init__(self, config_path: str, search_mode: str = 'hybrid'):
         """
         初始化 Agent
         
         Args:
             config_path: 配置文件路径
-            use_hybrid: 是否使用混合搜索模式（arXiv + Brave）
+            search_mode: 搜索模式 - 'hybrid'(混合), 'arxiv'(仅arXiv), 'semantic'(仅语义搜索)
         """
         self.logger = get_logger('agent')
         self.config_path = config_path
@@ -48,9 +48,13 @@ class ArxivPapersAgent:
         self.logger.info("✓ 知识库管理器已初始化")
 
         # 初始化论文抓取器
-        if use_hybrid and self.config.get('brave', {}).get('enabled', False):
-            self.fetcher = HybridFetcher(self.config)
-            self.logger.info("✓ 使用混合搜索模式 (arXiv + Brave)")
+        self.search_mode = search_mode
+        if search_mode == 'semantic':
+            self.fetcher = HybridFetcher(self.config, search_mode='semantic')
+            self.logger.info("✓ 使用 Semantic Scholar 语义搜索模式")
+        elif search_mode == 'hybrid' and self.config.get('brave', {}).get('enabled', False):
+            self.fetcher = HybridFetcher(self.config, search_mode='hybrid')
+            self.logger.info("✓ 使用混合搜索模式 (arXiv + Semantic + Brave)")
         else:
             self.fetcher = ArxivFetcher(self.config)
             self.logger.info("✓ 使用 arXiv 搜索模式")
@@ -388,9 +392,10 @@ def main():
         help='Include references when adding paper'
     )
     parser.add_argument(
-        '--no-hybrid',
-        action='store_true',
-        help='Disable hybrid search mode (use arXiv only)'
+        '--search-mode', '-s',
+        choices=['hybrid', 'arxiv', 'semantic'],
+        default='hybrid',
+        help='Search mode: hybrid (default), arxiv (keyword only), semantic (Semantic Scholar only)'
     )
     parser.add_argument(
         '--verbose', '-v',
@@ -410,7 +415,7 @@ def main():
         # 初始化 Agent
         agent = ArxivPapersAgent(
             args.config, 
-            use_hybrid=not args.no_hybrid
+            search_mode=args.search_mode
         )
 
         if args.mode == 'daily':

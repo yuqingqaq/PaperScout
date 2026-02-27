@@ -61,11 +61,13 @@ python3 tests/run_tests.py --test brave
 ### 4. 运行
 
 ```bash
-# 每日推荐（混合搜索模式）
+# 每日推荐（默认混合搜索模式）
 python3 src/main.py --mode daily
 
-# 仅使用 arXiv 搜索
-python3 src/main.py --mode daily --no-hybrid
+# 选择搜索模式
+python3 src/main.py --mode daily -s hybrid    # 混合: arXiv + Semantic Scholar
+python3 src/main.py --mode daily -s semantic  # 仅 Semantic Scholar 语义搜索
+python3 src/main.py --mode daily -s arxiv     # 仅 arXiv 关键词搜索
 
 # 详细日志模式
 python3 src/main.py --mode daily -v

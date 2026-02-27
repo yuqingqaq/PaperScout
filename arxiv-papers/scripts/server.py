@@ -96,9 +96,17 @@ class APIHandler(SimpleHTTPRequestHandler):
     def handle_run_daily(self):
         """触发每日推荐流程（更新 papers.json 与 kb_data.json）"""
         try:
+            # 读取请求体获取搜索模式
+            content_length = int(self.headers.get('Content-Length', 0))
+            search_mode = 'hybrid'  # 默认
+            if content_length > 0:
+                post_data = self.rfile.read(content_length)
+                data = json.loads(post_data.decode('utf-8'))
+                search_mode = data.get('search_mode', 'hybrid')
+            
             from src.main import ArxivPapersAgent
 
-            agent = ArxivPapersAgent(config_path=CONFIG_PATH, use_hybrid=True)
+            agent = ArxivPapersAgent(config_path=CONFIG_PATH, search_mode=search_mode)
             recommended = agent.daily_recommendation()
 
             kb_manager = KnowledgeBaseManager(KB_PATH, SUGGESTIONS_PATH)
@@ -106,7 +114,8 @@ class APIHandler(SimpleHTTPRequestHandler):
 
             self.send_json_response({
                 'success': True,
-                'added_papers': len(recommended)
+                'added_papers': len(recommended),
+                'search_mode': search_mode
             })
         except Exception as e:
             self.send_json_response({'success': False, 'error': str(e)})

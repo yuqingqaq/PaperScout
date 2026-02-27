@@ -16,9 +16,15 @@ logger = get_logger('fetchers.hybrid')
 class HybridFetcher:
     """混合使用 arXiv、Brave 和 Semantic Scholar 的智能抓取器"""
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, search_mode: str = 'hybrid'):
+        """
+        Args:
+            config: 配置字典
+            search_mode: 'hybrid'(混合), 'arxiv'(仅arXiv), 'semantic'(仅语义搜索)
+        """
         self.config = config
         self.arxiv_fetcher = ArxivFetcher(config)
+        self.search_mode = search_mode
 
         # 检查是否启用 Brave
         self.brave_enabled = config.get('brave', {}).get('enabled', False)
@@ -41,10 +47,9 @@ class HybridFetcher:
         智能搜索论文
 
         策略：
-        1. 优先使用 arXiv API（带限流控制）
-        2. 使用 Semantic Scholar 补充高引用论文
-        3. 如果 arXiv 失败或结果太少，使用 Brave 补充
-        4. 合并去重
+        - semantic: 仅使用 Semantic Scholar 语义搜索
+        - arxiv: 仅使用 arXiv 关键词搜索
+        - hybrid: arXiv + Semantic Scholar + Brave 补充
 
         Args:
             days_back: 搜索最近多少天
@@ -53,6 +58,37 @@ class HybridFetcher:
         Returns:
             论文列表
         """
+        # Semantic Scholar Only 模式
+        if self.search_mode == 'semantic':
+            logger.info("=" * 50)
+            logger.info("🔍 Semantic Scholar 语义搜索模式")
+            logger.info("=" * 50)
+            
+            semantic_papers = []
+            try:
+                semantic_papers = self._search_with_semantic_scholar(limit=50)
+                logger.info(f"✓ Semantic Scholar 找到 {len(semantic_papers)} 篇论文")
+            except Exception as e:
+                logger.error(f"✗ Semantic Scholar 搜索失败: {e}")
+            
+            return semantic_papers
+        
+        # arXiv Only 模式
+        if self.search_mode == 'arxiv':
+            logger.info("=" * 50)
+            logger.info("🔍 arXiv 关键词搜索模式")
+            logger.info("=" * 50)
+            
+            arxiv_papers = []
+            try:
+                arxiv_papers = self.arxiv_fetcher.search_papers(days_back=days_back)
+                logger.info(f"✓ arXiv 找到 {len(arxiv_papers)} 篇论文")
+            except Exception as e:
+                logger.error(f"✗ arXiv 搜索失败: {e}")
+            
+            return arxiv_papers
+        
+        # 混合搜索模式
         logger.info("=" * 50)
         logger.info("🔍 混合搜索模式")
         logger.info("=" * 50)
@@ -95,10 +131,9 @@ class HybridFetcher:
         return merged_papers
 
     def _search_with_semantic_scholar(self, limit: int = 20) -> List[Dict]:
-        """使用 Semantic Scholar 搜索高引用论文"""
+        """使用 Semantic Scholar 搜索高引用论文（直接获取完整信息，不调用 arXiv）"""
         keywords = self.config.get('arxiv', {}).get('search_keywords', [])
         all_papers = []
-        seen_ids = set()
         
         # 获取 API key（如果配置了）
         api_key = self.config.get('semantic_scholar', {}).get('api_key', '')
@@ -112,11 +147,11 @@ class HybridFetcher:
             'query': main_keyword,
             'limit': limit,
             'year': '2024-',  # 只要 2024 年及之后的论文
-            'fields': 'title,year,citationCount,externalIds',
+            'fields': 'title,authors,year,abstract,citationCount,externalIds,publicationDate',
             'fieldsOfStudy': 'Computer Science'
         }
         
-        # 重试机制：每秒尝试一次，最多10次
+        # 重试机制
         max_retries = 10
         for attempt in range(1, max_retries + 1):
             try:
@@ -125,35 +160,54 @@ class HybridFetcher:
                 
                 if response.status_code == 200:
                     data = response.json()
-                    logger.info(f"    ✓ Semantic Scholar 返回 {len(data.get('data', []))} 条结果")
+                    results = data.get('data', [])
+                    logger.info(f"    ✓ Semantic Scholar 返回 {len(results)} 条结果")
                     
-                    for item in data.get('data', []):
+                    seen_ids = set()
+                    for item in results:
                         # 提取 arXiv ID
                         external_ids = item.get('externalIds', {}) or {}
                         arxiv_id = external_ids.get('ArXiv')
                         
-                        if not arxiv_id or arxiv_id in seen_ids:
+                        if not arxiv_id or arxiv_id not in seen_ids:
+                            pass
+                        else:
                             continue
                         
-                        seen_ids.add(arxiv_id)
+                        if arxiv_id:
+                            seen_ids.add(arxiv_id)
                         
-                        # 获取完整的 arXiv 信息
-                        full_paper = self.arxiv_fetcher.get_paper_by_id(arxiv_id)
+                        # 直接从 Semantic Scholar 构建论文信息
+                        authors = item.get('authors', [])
+                        author_names = ', '.join([a.get('name', '') for a in authors]) if authors else 'Unknown'
                         
-                        if full_paper:
-                            full_paper['citation_count'] = item.get('citationCount', 0)
-                            full_paper['source'] = 'semantic_scholar'
-                            all_papers.append(full_paper)
-                            logger.debug(f"    ✓ 添加论文: {full_paper.get('title', '')[:40]}... (引用: {item.get('citationCount', 0)})")
+                        pub_date = item.get('publicationDate') or f"{item.get('year', 'Unknown')}"
                         
-                        time.sleep(0.3)  # arXiv API 限流保护
+                        paper = {
+                            'arxiv_id': arxiv_id or item.get('paperId', ''),
+                            'title': item.get('title', 'Unknown'),
+                            'authors': author_names,
+                            'published': pub_date,
+                            'abstract': item.get('abstract', '') or '',
+                            'arxiv_url': f"https://arxiv.org/abs/{arxiv_id}" if arxiv_id else '',
+                            'pdf_url': f"https://arxiv.org/pdf/{arxiv_id}" if arxiv_id else '',
+                            'citation_count': item.get('citationCount', 0),
+                            'source': 'semantic_scholar'
+                        }
+                        
+                        # 只添加有 abstract 的论文
+                        if paper['abstract']:
+                            all_papers.append(paper)
+                            logger.debug(f"    ✓ {paper['title'][:50]}... (引用: {paper['citation_count']})")
                     
+                    logger.info(f"    ✓ 有效论文: {len(all_papers)} 篇")
                     break  # 成功，退出重试循环
                     
                 elif response.status_code == 429:
                     if attempt < max_retries:
-                        logger.warning(f"    Semantic Scholar 限流 (429)，1秒后重试 ({attempt}/{max_retries})...")
-                        time.sleep(1)
+                        wait_time = min(attempt * 2, 10)  # 2s, 4s, 6s... 最多 10s
+                        logger.warning(f"    Semantic Scholar 限流 (429)，{wait_time}秒后重试 ({attempt}/{max_retries})...")
+                        time.sleep(wait_time)
                     else:
                         logger.warning(f"    Semantic Scholar 限流，已重试 {max_retries} 次，跳过")
                 else:
