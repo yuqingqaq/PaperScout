@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "last_updated": "2026-02-27",
-    "total_pending": 64
+    "last_updated": "2026-02-28",
+    "total_pending": 65
   },
   "suggestions": [
     {
@@ -731,6 +731,17 @@
       "id": 66,
       "status": "pending",
       "created_at": "2026-02-27 12:40:31"
+    },
+    {
+      "type": "update_existing",
+      "section": "四、 评估体系与挑战",
+      "content": "记忆-行动耦合评估：通过跨会话依赖子任务测试记忆驱动的未来决策能力",
+      "reason": "知识库现有Benchmark主要评估记忆召回或单会话任务，该论文提出了记忆与行动紧密耦合的新评估范式，填补了评估维度空白",
+      "paper_arxiv_id": "2602.16313",
+      "paper_title": "MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks",
+      "id": 67,
+      "status": "pending",
+      "created_at": "2026-02-28 13:56:44"
     }
   ]
 }

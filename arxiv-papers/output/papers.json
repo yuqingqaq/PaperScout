@@ -1,6 +1,52 @@
 {
   "papers": [
     {
+      "arxiv_id": "2602.16313",
+      "title": "MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks",
+      "authors": "Zexue He, Yu Wang, Churan Zhi, Yuanzhe Hu, Tzu-Ping Chen, Lang Yin, Zeming Chen, Tong Wu, Siru Ouyang, Zihan Wang, Jiaxin Pei, Julian McAuley, Yejin Choi, A. Pentland",
+      "published": "2026-02-18",
+      "abstract": "Existing evaluations of agents with memory typically assess memorization and action in isolation. One class of benchmarks evaluates memorization by testing recall of past conversations or text but fails to capture how memory is used to guide future decisions. Another class focuses on agents acting in single-session tasks without the need for long-term memory. However, in realistic settings, memorization and action are tightly coupled: agents acquire memory while interacting with the environment, and subsequently rely on that memory to solve future tasks. To capture this setting, we introduce MemoryArena, a unified evaluation gym for benchmarking agent memory in multi-session Memory-Agent-Environment loops. The benchmark consists of human-crafted agentic tasks with explicitly interdependent subtasks, where agents must learn from earlier actions and feedback by distilling experiences into memory, and subsequently use that memory to guide later actions to solve the overall task. MemoryArena supports evaluation across web navigation, preference-constrained planning, progressive information search, and sequential formal reasoning, and reveals that agents with near-saturated performance on existing long-context memory benchmarks like LoCoMo perform poorly in our agentic setting, exposing a gap in current evaluations for agents with memory.",
+      "arxiv_url": "https://arxiv.org/abs/2602.16313",
+      "pdf_url": "https://arxiv.org/pdf/2602.16313",
+      "citation_count": 0,
+      "source": "semantic_scholar",
+      "relevance": 1.0,
+      "contributions": [
+        "提出MemoryArena多会话跨任务记忆评估基准",
+        "设计显式依赖子任务的记忆-行动耦合评估范式",
+        "揭示现有长上下文基准与真实智能体记忆能力的评估鸿沟",
+        "覆盖Web导航、偏好规划、渐进搜索等四类任务场景"
+      ],
+      "key_results": [
+        "在LoCoMo等现有基准表现接近饱和的智能体在MemoryArena上表现显著下降",
+        "多会话跨任务依赖设置下记忆利用能力与单会话记忆召回能力存在显著差距",
+        "现有评估体系未能有效衡量记忆驱动的未来决策能力"
+      ],
+      "tags": [
+        "Episodic Memory",
+        "Memory Retrieval",
+        "External Memory",
+        "Benchmark",
+        "Multi-Session Reasoning"
+      ],
+      "quality_score": 88,
+      "recommendation": "首个系统性评估记忆-行动耦合的多会话智能体基准，揭示现有评估盲区",
+      "community_signals": {
+        "discussions": [],
+        "github_repos": [],
+        "tweets": [],
+        "total_discussion_count": 0,
+        "github_stars": 0,
+        "tweet_count": 0,
+        "hacker_news_mentions": 0,
+        "reddit_mentions": 0,
+        "social_score": 0
+      },
+      "quality_score_adjusted": 70,
+      "quality_score_original": 88,
+      "recommend_date": "2026-02-28"
+    },
+    {
       "arxiv_id": "2510.09038",
       "title": "Auto-scaling Continuous Memory for GUI Agent",
       "authors": "Wenyi Wu, Kun Zhou, Ruoxin Yuan, V. Yu, Stephen Wang, Zhiting Hu, Biwei Huang",
@@ -44,7 +90,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2601.20465",
@@ -90,7 +136,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2601.18642",
@@ -136,7 +182,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2602.05665",
@@ -182,7 +228,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-06"
     },
     {
       "arxiv_id": "2509.11914",
@@ -230,7 +276,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2510.01353",
@@ -276,7 +322,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2510.04851",
@@ -322,7 +368,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2510.02373",
@@ -368,7 +414,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2508.06433",
@@ -414,7 +460,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2508.09736",
@@ -460,7 +506,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2508.03341",
@@ -506,7 +552,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2511.20857",
@@ -552,7 +598,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2506.07398",
@@ -599,7 +645,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2408.09559",
@@ -644,7 +690,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2507.07957",
@@ -690,7 +736,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2507.02259",
@@ -736,7 +782,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2501.13956",
@@ -782,7 +828,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2512.12818",
@@ -828,7 +874,7 @@
       },
       "quality_score_adjusted": 73,
       "quality_score_original": 92,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2512.18746",
@@ -874,7 +920,7 @@
       },
       "quality_score_adjusted": 73,
       "quality_score_original": 92,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2509.25140",
@@ -921,7 +967,7 @@
       },
       "quality_score_adjusted": 73,
       "quality_score_original": 92,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-01-30"
     },
     {
       "arxiv_id": "2602.21862v1",
@@ -970,7 +1016,7 @@
       },
       "quality_score_adjusted": 57,
       "quality_score_original": 72,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.21394v2",
@@ -1019,7 +1065,7 @@
       },
       "quality_score_adjusted": 62,
       "quality_score_original": 78,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-25"
     },
     {
       "arxiv_id": "2602.22142v1",
@@ -1068,7 +1114,7 @@
       },
       "quality_score_adjusted": 62,
       "quality_score_original": 78,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.22479v1",
@@ -1117,7 +1163,7 @@
       },
       "quality_score_adjusted": 62,
       "quality_score_original": 78,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.21477v1",
@@ -1166,7 +1212,7 @@
       },
       "quality_score_adjusted": 65,
       "quality_score_original": 82,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.22455v1",
@@ -1215,7 +1261,7 @@
       },
       "quality_score_adjusted": 65,
       "quality_score_original": 82,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.22680v1",
@@ -1464,7 +1510,7 @@
       },
       "quality_score_adjusted": 69,
       "quality_score_original": 87,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.22402v1",
@@ -1516,7 +1562,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.22406v1",
@@ -1565,7 +1611,7 @@
       },
       "quality_score_adjusted": 70,
       "quality_score_original": 88,
-      "recommend_date": "2026-02-27"
+      "recommend_date": "2026-02-26"
     },
     {
       "arxiv_id": "2602.22603v1",
@@ -2444,7 +2490,7 @@
       "title": "Look Back to Reason Forward: Revisitable Memory for Long-Context LLM Agents (ReMemR1)",
       "authors": "Yaorui Shi, Yuxin Chen, Siyuan Wang, Sihang Li, Hengxing Cai, Qi Gu, Xiang Wang, An Zhang",
       "published": "2025-09-27",
-      "recommend_date": "2026-02-10",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "突破线性扫描'memorize while reading'范式的3大瓶颈:潜在证据剪枝、覆盖信息损失、稀疏RL信号",
         "集成memory retrieval进update流程:允许selective callback历史记忆实现非线性推理",
@@ -2501,7 +2547,7 @@
       "title": "AgentSys: Secure and Dynamic LLM Agents Through Explicit Hierarchical Memory Management",
       "authors": "Ruoyao Wen, Hao Li, Chaowei Xiao, Ning Zhang",
       "published": "2026-02-07",
-      "recommend_date": "2026-02-08",
+      "recommend_date": "2026-02-09",
       "contributions": [
         "OS-inspired进程隔离式记忆架构,防御indirect prompt injection攻击",
         "层次化agent组织:main agent spawn worker agents,隔离上下文执行tool calls",
@@ -2530,7 +2576,7 @@
       "title": "A-Mem: Agentic Memory for LLM Agents",
       "authors": "Wujiang Xu, et al.",
       "published": "2025-01-09",
-      "recommend_date": "2026-02-07",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "设计自主记忆管理的agent框架",
         "实现记忆的自动创建、更新、检索、删除",
@@ -2556,7 +2602,7 @@
       "title": "LongLLMLingua: Accelerating LLMs via Prompt Compression",
       "authors": "Huiqiang Jiang, Qianhui Wu, Xufang Luo, et al.",
       "published": "2023-10-09",
-      "recommend_date": "2026-02-07",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出question-aware prompt压缩方法",
         "设计coarse-to-fine的层次压缩策略",
@@ -2583,7 +2629,7 @@
       "title": "HiAgent: Hierarchical Working Memory for Multi-step Agent Tasks",
       "authors": "Yuyang Hu, et al.",
       "published": "2025-01-27",
-      "recommend_date": "2026-02-07",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出分层工作记忆管理框架",
         "设计subgoal-level和step-level两层记忆结构",
@@ -2716,7 +2762,7 @@
       "title": "Retrieval-Augmented Generation with Graphs (GraphRAG Survey)",
       "authors": "Haoyu Han, Yu Wang, Harry Shomer, et al.",
       "published": "2025-01-01",
-      "recommend_date": "2026-02-06",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "系统梳理Graph-enhanced RAG研究进展",
         "提出图索引、图检索、图增强生成的统一框架",
@@ -2742,7 +2788,7 @@
       "title": "Retrieval-Augmented Generation for Large Language Models: A Survey",
       "authors": "Yunfan Gao, Yun Xiong, Xinyu Gao, et al.",
       "published": "2023-12-18",
-      "recommend_date": "2026-02-06",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "全面综述RAG技术发展脉络",
         "提出Naive RAG → Advanced RAG → Modular RAG演进框架",
@@ -2768,7 +2814,7 @@
       "title": "REMEMBR: A Multi-Faceted Memory Framework for Agents",
       "authors": "Yutao Zhu, et al.",
       "published": "2024-10-11",
-      "recommend_date": "2026-02-06",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出多维度记忆整合框架",
         "融合factual、experiential、procedural三类记忆",
@@ -2794,7 +2840,7 @@
       "title": "PersonaMem-v2: Personalized Intelligence via Agentic Memory",
       "authors": "Bowen Jiang, Yuan Yuan, Maohao Shen, et al.",
       "published": "2025-12-07",
-      "recommend_date": "2026-02-06",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "构建1000用户×300+场景的大规模个性化数据集",
         "设计agentic memory系统,维护可读的用户记忆",
@@ -2820,7 +2866,7 @@
       "title": "Memento: Long-term Memory System for General-purpose AI Agents",
       "authors": "Zhihao Zhou, et al.",
       "published": "2024-07-25",
-      "recommend_date": "2026-02-05",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出success/failure case distillation机制",
         "设计trajectory-level记忆存储和检索",
@@ -2846,7 +2892,7 @@
       "title": "MemoryBank: Enhancing Large Language Models with Long-Term Memory",
       "authors": "Wanjun Zhong, Lianghong Guo, Qiqi Gao, et al.",
       "published": "2023-05-17",
-      "recommend_date": "2026-02-05",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "设计experience bank与时间衰减的遗忘机制",
         "提出SiliconFriend长期陪伴对话框架",
@@ -2872,7 +2918,7 @@
       "title": "LoCoMo: A Benchmark for Long-Context Conversation Memory",
       "authors": "Adyasha Maharana, et al.",
       "published": "2024-08-03",
-      "recommend_date": "2026-02-05",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "构建长对话记忆评估benchmark,包含600+多轮对话",
         "设计5类记忆任务:问答、摘要、事件排序、状态追踪、推理",
@@ -2898,7 +2944,7 @@
       "title": "LongMemEval: Benchmarking Long-term Memory of Chat Assistants",
       "authors": "Xiaoxia Wu, et al.",
       "published": "2024-06-15",
-      "recommend_date": "2026-02-05",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "设计500+会话的大规模长期记忆benchmark",
         "涵盖记忆检索、更新、冲突解决、推理4类能力",
@@ -3005,7 +3051,7 @@
       "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
       "authors": "Noah Shinn, Federico Cassano, Beck Labash, et al.",
       "published": "2023-03-20",
-      "recommend_date": "2026-02-04",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出verbal reinforcement learning,用自然语言存储反馈",
         "设计trajectory memory存储成功/失败经验",
@@ -3032,7 +3078,7 @@
       "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
       "authors": "Guanzhi Wang, Yuqi Xie, Yunfan Jiang, et al.",
       "published": "2023-05-25",
-      "recommend_date": "2026-02-04",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出Skill Library架构,将技能作为可复用的代码记忆",
         "设计automatic curriculum实现开放式探索",
@@ -3059,7 +3105,7 @@
       "title": "ExpeL: LLM Agents Are Experiential Learners",
       "authors": "Andrew Zhao, Daniel Huang, Quentin Xu, et al.",
       "published": "2023-08-19",
-      "recommend_date": "2026-02-04",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出从任务执行中自动提取可复用insights",
         "设计experience bank存储成功策略和失败教训",
@@ -3085,7 +3131,7 @@
       "title": "HippoRAG: Neurobiologically Inspired Long-Term Memory for LLMs",
       "authors": "Bernal Jimenez Gutierrez, Yiheng Shu, Yu Gu, et al.",
       "published": "2024-05-23",
-      "recommend_date": "2026-02-04",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "借鉴海马体记忆索引理论设计知识图谱索引",
         "使用Personal PageRank实现上下文敏感的记忆检索",
@@ -3249,7 +3295,7 @@
       "title": "Memory in the Age of AI Agents: A Survey",
       "authors": "Yuyang Hu, Shichun Liu, Yanwei Yue, et al.",
       "published": "2025-12-18",
-      "recommend_date": "2026-02-03",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出Forms-Functions-Dynamics统一分类框架,系统性梳理Agent Memory研究",
         "区分Token-level、Parametric、Latent三种记忆形式",
@@ -3277,7 +3323,7 @@
       "title": "Generative Agents: Interactive Simulacra of Human Behavior",
       "authors": "Joon Sung Park, Joseph C. O'Brien, Carrie J. Cai, et al.",
       "published": "2023-04-07",
-      "recommend_date": "2026-02-03",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出Memory Stream架构,融合factual和experiential记忆",
         "设计reflection机制,从记忆中提取高层次洞察",
@@ -3304,7 +3350,7 @@
       "title": "MemGPT: Towards LLMs as Operating Systems",
       "authors": "Charles Packer, Sarah Wooders, Kevin Lin, et al.",
       "published": "2023-10-12",
-      "recommend_date": "2026-02-03",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出OS-inspired分层记忆架构,模拟虚拟内存分页",
         "设计main context (RAM) + external context (disk)两层结构",
@@ -3331,7 +3377,7 @@
       "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
       "authors": "Shunyu Yao, Jeffrey Zhao, Dian Yu, et al.",
       "published": "2022-10-06",
-      "recommend_date": "2026-02-03",
+      "recommend_date": "2026-01-30",
       "contributions": [
         "提出Reasoning + Acting交织范式,开创Agent基础架构",
         "将思考过程外显为trace memory,支持可解释推理",
@@ -4404,7 +4450,7 @@
     }
   ],
   "metadata": {
-    "last_updated": "2026-02-27",
-    "total_papers": 107
+    "last_updated": "2026-02-28",
+    "total_papers": 108
   }
 }
